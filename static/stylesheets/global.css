@@ -1,0 +1,11 @@
+body {
+  -webkit-font-smoothing: antialiased;
+  -o-background-size: cover;
+	background-color:#1a9b5a;
+   color:#ffff;  
+}
+
+a {
+  color: #09F0CF;
+  text-decoration: none;
+}

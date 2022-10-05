@@ -1,0 +1,12 @@
+http://localhost:8080/device
+	Admin ID: 1
+	Password: DREW
+	Mac/Desc: Whatever
+	-1 r.ParseForm() failed.
+	-2 SP_SETDEVICE failed.
+	-3 Unmarshal failed
+	-4 r.PostFormValue("nmCust") not a number
+	-5 store or store id not valid
+	
+	
+PLU 3064 for spc chart.

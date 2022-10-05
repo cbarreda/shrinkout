@@ -1,0 +1,24 @@
+
+2022/01/25 15:27:16:bsfExecuteDbQuery: Select SP_SETDEVICE(1,'DREW',1,1,'B','B')-->pq: database "dfreshthymesdb" does not exist
+2022/01/25 21:13:46:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/25 21:15:02:bsfExecuteDbQuery: Select SP_LOGIN(1,1,115,'')-->pq: function sp_login(integer, integer, integer, unknown) does not exist
+2022/01/25 21:15:41:bsfExecuteDbQuery: Select SP_LOGIN(1,1,15,'')-->pq: function sp_login(integer, integer, integer, unknown) does not exist
+2022/01/25 21:17:00:bsfExecuteDbQuery: Select SP_LOGIN(1,1,149481,'')-->pq: function sp_login(integer, integer, integer, unknown) does not exist
+2022/01/25 21:17:20:bsfExecuteDbQuery: Select SP_LOGIN(1,1,14,'')-->pq: function sp_login(integer, integer, integer, unknown) does not exist
+2022/01/25 21:29:18:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/25 21:29:23:bsfExecuteDbQuery: Select SP_LOGIN(1,1,115,'')-->pq: function sp_login(integer, integer, integer, unknown) does not exist
+2022/01/25 21:30:21:bsfExecuteDbQuery: Select SP_LOGIN(1,1,115,'')-->pq: function sp_login(integer, integer, integer, unknown) does not exist
+2022/01/25 23:21:09:bsfExecuteDbQuery: Select SP_SETDEVICE(1,'DREW',1,1,'A','A')-->pq: relation "t_user" does not exist
+2022/01/26 00:16:52:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/26 00:16:59:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/26 08:09:02:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/26 11:26:15:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/26 11:37:06:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/26 14:03:09:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/27 20:02:51:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/27 20:02:51:pkgUser.GetClsDevice-->Get JSON ClsDevice FAILED
+2022/01/29 08:13:21:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/01/29 13:54:18:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/09/16 08:20:49:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value
+2022/09/16 08:20:49:pkgUser.GetClsDevice-->Get JSON ClsDevice FAILED
+2022/09/16 13:11:28:pkgUser.GetClsBaseUser-->invalid character 'G' looking for beginning of value

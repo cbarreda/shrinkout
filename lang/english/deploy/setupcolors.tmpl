@@ -1,0 +1,81 @@
+{{ template "bootstrap" . }}
+
+{{define "bootstrap"}}
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<base href="http://localhost:8080/">		
+		<!-- -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"><link rel="stylesheet" href="static/stylesheets/bootstrap/3.4.1/bootstrap-theme.min.css">
+	
+		<script src = "./static/js/globals.js"></script><script src = "./static/js/ajax.js"></script>	
+		<link rel="stylesheet" href="./static/stylesheets/global.css">
+		
+		<script src = "/static/js/local/setupcolors.js"></script>
+		<!-- -->
+		<title>ShrinkOut</title>
+<meta name="description" content="Meta Content here">
+<!-- Google Analytics -->
+		<!-- local header data here -->		
+		<!-- Google analytics -->	
+		{{template "localJs" .}}
+	</head>	
+	<body class="body-wrapper">
+		{{template "defaultNavBar" .}}
+		{{template "defaultContent" .}}
+	</body>
+</html>
+{{end}}
+ 
+
+{{define "defaultContent"}}
+<h1>ShrinkOut Color Setup</h1>
+	<table style="margin-left:10px">
+		<tr>
+		<td><td><label for="IdBody" 	>Page Background</label>	</td><td><input type="color" id="IdBody" 				value="{{.IdBody}}"></td></td>			<td style="padding-left:50px" ><td><label for="IdItemAIC	" >Box Active Icon	</label>  	</td><td><input type="color" id="IdItemAIC" 		value="{{.IdItemAIC}}"></td></td></tr>
+		<tr><td><td><label for="IdHeaderC" 	>Header Background</label>  </td><td><input type="color" id="IdHeaderC" 			value="{{.IdHeaderC}}"></td></td>   <td style="padding-left:50px" ><td><label for="IdFooterMainB" >Footer Background</label>  	</td><td><input type="color" id="IdFooterMainB" 	value="{{.IdFooterMainB}}"></td></td></tr>
+		<tr><td><td><label for="IdNavBrandB">Logo Background</label>  	</td><td><input type="color" id="IdNavBrandB"			value="{{.IdNavBrandB}}"></td></td> <td style="padding-left:50px" ><td><label for="IdFooterMainLC" >Footer Link Color</label>  	</td><td><input type="color" id="IdFooterMainLC"	value="{{.IdFooterMainLC}}"></td></td></tr>
+		<tr><td><td><label for="IdMainNavB" >Nav Bar Background</label>  		</td><td><input type="color" id="IdMainNavB" 	value="{{.IdMainNavB}}"></td></td>  <td style="padding-left:50px" ><td><label for="IdSectionTitleH2" >Main H2 Color</label>		</td><td><input type="color" id="IdSectionTitleH2" 	value="{{.IdSectionTitleH2}}"></td></td></tr>
+		<tr><td><td><label for="IdBannerH1C" >Banner H1 Text</label>  	</td><td><input type="color" id="IdBannerH1C" 			value="{{.IdBannerH1C}}"></td></td> <td style="padding-left:50px" ><td><label for="IdSectionTitleP" >Main P</label>				</td><td><input type="color" id="IdSectionTitleP" 	value="{{.IdSectionTitleP}}"></td></td></tr>
+		<tr><td><td><label for="IdBannerH5C" >Banner H5 Text</label>  	</td><td><input type="color" id="IdBannerH5C" 			value="{{.IdBannerH5C}}"></td></td> <td style="padding-left:50px" ><td><label for="IdTeamCBH5" >Carlos H5</label>				</td><td><input type="color" id="IdTeamCBH5" 		value="{{.IdTeamCBH5}}"></td></td></td></tr>
+		<tr><td><td><label for="IdItem1B	" >Box 1 Background</label>  		</td><td><input type="color" id="IdItem1B" 		value="{{.IdItem1B}}"></td></td>    <td style="padding-left:50px" ><td><label for="IdTeamCBP" >Carlos P</label>					</td><td><input type="color" id="IdTeamCBP" 		value="{{.IdTeamCBP}}"></td></td></td></tr>
+		<tr><td><td><label for="IdItem2B	" >Box 2 Background</label>  		</td><td><input type="color" id="IdItem2B" 		value="{{.IdItem2B}}"></td></td>    <td style="padding-left:50px" ><td><label for="IdTeamHBH5" >Hunter H5</label>				</td><td><input type="color" id="IdTeamHBH5" 		value="{{.IdTeamHBH5}}"></td></td></td></tr>
+		<tr><td><td><label for="IdItemAB	" >Box Active Background</label>  		</td><td><input type="color" id="IdItemAB" 	value="{{.IdItemAB}}"></td></td>    <td style="padding-left:50px" ><td><label for="IdTeamHBP" >Hunter P</label>					</td><td><input type="color" id="IdTeamHBP" 		value="{{.IdTeamHBP}}"></td></td></td></tr>
+		<tr><td><td><label for="IdItem1H5C	" >Box 1 H5 Text</label>  		</td><td><input type="color" id="IdItem1H5C" 		value="{{.IdItem1H5C}}"></td></td>  <td style="padding-left:50px" ><td><label for="IdTeamSDH5" >Seth H5</label>					</td><td><input type="color" id="IdTeamSDH5" 		value="{{.IdTeamSDH5}}"></td></td></td></tr>
+		<tr><td><td><label for="IdItem2H5C	" >Box 2 H5 Text</label>  		</td><td><input type="color" id="IdItem2H5C" 		value="{{.IdItem2H5C}}"></td></td>  <td style="padding-left:50px" ><td><label for="Seth P">IdTeamSDP</label>					</td><td><input type="color" id="IdTeamSDP" 		value="{{.IdTeamSDP}}"></td></td></td></tr>
+		<tr><td><td><label for="IdItemAH5C	" >Box Active Text</label>  		</td><td><input type="color" id="IdItemAH5C" 	value="{{.IdItemAH5C}}"></td></td>  <td style="padding-left:50px" ><td><label for="IdTeamCBB">Carlos Box</label>				</td><td><input type="color" id="IdTeamCBB" 		value="{{.IdTeamCBB}}"></td></td></td></tr>
+		<tr><td><td><label for="IdItem1IC	" >Box 1 Icon</label>  		</td><td><input type="color" id="IdItem1IC" 			value="{{.IdItem1IC}}"></td></td>   <td style="padding-left:50px" ><td><label for="IdTeamHBB">Hunter's Box</label>				</td><td><input type="color" id="IdTeamHBB" 		value="{{.IdTeamHBB}}"></td></td></td></tr>
+		<tr><td><td><label for="IdItem2IC	" >Box 2 Icon</label>  		</td><td><input type="color" id="IdItem2IC" 			value="{{.IdItem2IC}}"></td></td>   <td style="padding-left:50px" ><td><label for="IdTeamSDB">Seth's Box</label>				</td><td><input type="color" id="IdTeamSDB" 		value="{{.IdTeamSDB}}"></td></td></td></tr>
+		<tr></td><td></td><td><a href="javascript:vfSave()">Save</a></td><td></td><td></td><td></td></td><td><a href="javascript:vfResetColors()">Reset</a></td></tr>
+	</table>	
+{{end}}
+
+		
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+{{define "defaultNavBar"}}
+<!-- -->
+{{end}}
+{{define "localJs"}}
+	<script>
+	</script>
+
+{{end}}

@@ -1,0 +1,259 @@
+
+{{ template "bootstrap" . }}
+
+{{define "bootstrap"}}
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  
+		<base href="http://localhost:8080/">		
+  		
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+	<script src="/static/mp/plugins/jquery/jquery.js"></script>
+	
+	<script src = "./static/js/globals.js"></script><script src = "./static/js/ajax.js"></script>	
+	<script src = "/static/js/local/main0.js"></script>
+
+
+  <!-- Bootstrap 
+	<link href="/static/mp/plugins/bootstrap/bootstrap.min.css" rel="stylesheet"> 
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBI14J_PNWVd-m0gnUBkjmhoQyNyd7nllA" async defer></script>
+	<link href="/static/mp/images/favicon.png" rel="shortcut icon">
+
+
+	<script src="/static/mp/plugins/slick/slick.min.js"></script>
+	<script src="/static/mp/js/custom.js"></script>
+  -->
+  <!-- themify icon -->
+  <link rel="stylesheet" href="/static/mp/plugins/themify-icons/themify-icons.css">
+  <!-- Slick Carousel -->
+  <link href="/static/mp/plugins/slick/slick.css" rel="stylesheet">
+  <!-- Slick Carousel Theme -->
+  <link href="/static/mp/plugins/slick/slick-theme.css" rel="stylesheet">
+  
+  <!-- CUSTOM CSS -->
+  <link href="/static/mp/css/style.css" rel="stylesheet">
+
+
+  
+
+
+		
+		
+		<!-- Google Analytics -->
+		<!-- local header data here -->		
+				{{template "localJs" .}}
+	</head>	
+	<body class="body-wrapper">
+		{{template "defaultNavBar" .}}
+		{{template "defaultContent" .}}
+	</body>
+</html>
+{{end}}
+ 
+{{define "defaultContent"}}
+<!--=====================================
+=            Homepage Banner            =
+======================================-->
+
+<section class="banner bg-1" id="home">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 align-self-center">
+				<!-- Contents -->
+				<div class="content-block">
+					<h1>Better Produce<br>Lower Cost</h1>
+					<h5>ShrinkOut provides produce managers with the tools they need to increase the quality of the produce they sell and to control and reduce shrink.</h5>
+					<!-- App Badge -->
+				</div>
+			</div>
+			<div class="col-md-4">
+				<!-- App Image -->
+				<div class="image-block">
+					<img class="img-fluid phone-thumb" src="static/images/phones/phonelogin.png" alt="login-screen">
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!--====  End of Homepage Banner  ====-->
+
+<!--===========================
+=            About            =
+============================-->
+
+<section class="about section bg-2" id="about">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-6 align-self-center text-center">
+				<!-- Image Content -->
+				<div class="image-block">
+					<img class="phone-thumb-md" src="static/images/phones/phonedata.png" alt="iphone-feature" class="img-fluid">
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-10 m-md-auto align-self-center ml-auto">
+				<div class="about-block">
+					<!-- About 01 -->
+					<div class="about-item one">
+						<div class="icon">
+							<i class="ti-palette"></i>
+						</div>
+						<div class="content">
+							<h5>Innovative Design</h5>
+							<p>Cells are mounted on the produce carts making it easy for employees to enter information as they stock produce.</p>
+						</div>
+					</div>
+					<!-- About 02 -->
+					<div class="about-item active">
+						<div class="icon">
+							<i class="ti-panel"></i>
+						</div>
+						<div class="content">
+							<h5>Easy to Use</h5>
+							<p>In our tests, it takes employees seconds to enter data. Impact on labor is insignificant.</p>
+						</div>
+					</div>
+					<!-- About 03 -->
+					<div class="about-item two">
+						<div class="icon">
+							<i class="ti-vector"></i>
+						</div>
+						<div class="content">
+							<h5>The data you need to manage your business</h5>
+							<p>Using ShrinkOut you can tell who stocked produce, how much they stocked, how long it took, how much they shrunk, why they shrunk it, who the producer was and much more.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!--====  End of About  ====-->
+
+
+<!--==========================
+=            Team            =
+===========================-->
+
+<section class="section team bg-shape-two" id="team">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="section-title mb-4">
+					<h2 class="mb-3">Our Creative Team</h2>
+					<p>A combination of tech, entrepreneurship and solid business skills.</p>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4 col-md-6">
+				<!-- Team Member -->
+				<div class="team-member text-center mb-4 mb-lg-0">
+					<div class="image">
+						<img class="img-fluid" src="static/images/team/member-one.jpg" alt="team-member">
+					</div>
+					<div class="name">
+						<h5>Carlos Barreda</h5>
+					</div>
+					<div class="position">
+						<p>Tech Whiz</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6">
+				<!-- Team Member -->
+				<div class="team-member text-center mb-4 mb-lg-0">
+					<div class="image">
+						<img class="img-fluid" src="static/images/team/member-two.jpg" alt="team-member">
+					</div>
+					<div class="name">
+						<h5>Hunter Bergman</h5>
+					</div>
+					<div class="position">
+						<p>Entrepreneur Extraordinaire</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6">
+				<!-- Team Member -->
+				<div class="team-member text-center mb-4 mb-lg-0">
+					<div class="image">
+						<img class="img-fluid" src="static/images/team/member-three.jpg" alt="team-member">
+					</div>
+					<div class="name">
+						<h5>Seth Daup</h5>
+					</div>
+					<div class="position">
+						<p>Business Wizard</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!--====  End of Team  ====-->
+
+<!--============================
+=            Footer            =
+=============================-->
+
+<footer class="footer-main">
+  <div class="container">
+    <div class="row">
+      <div class="col" align="center">
+		<!--a class="emailLink" href = "mailto: sales@shrinkout.com">Email Us</a-->
+      </div>
+    </div>
+  </div>
+</footer>
+{{end}}
+
+
+
+
+
+{{define "defaultNavBar"}}
+<nav class="navbar main-nav fixed-top navbar-expand-lg large">
+  <div class="container">
+      <a class="navbar-brand" href="index.html"><img src="static/images/logo.png" alt="logo"></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="ti-menu text-white"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link scrollTo" href="#home">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link scrollTo" href="#about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link scrollTo" href="#team">Team</a>
+        </li>
+      </ul>
+      </div>
+  </div>
+</nav>
+{{end}}
+{{define "localJs"}}
+	<script>
+		function sfLocalMessage(iId){
+			switch(iId){
+				case -2000: return "email or password are incorrect. Please try again.";break;
+				case 0:  return "invalid email";break;
+				case 1:  return "Invalid Password";break;
+				case 10: return "New password emailed to you";break;
+				default: return gsfUnknownError(iId);
+			}
+		}
+	</script>
+
+{{end}}

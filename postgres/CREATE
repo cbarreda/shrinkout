@@ -1,0 +1,339 @@
+/*	
+	t_store					Super Saver, HyVee...
+	t_storeno				Super Saver O, Super Saver Cornhusker...
+	t_storedept				Meat, Produce..
+	t_storeloc				location inside a dept. Ie vegetables, fruit in the produce dept
+	t_produce				items ie mangoes, apples, milk. Global list of all items not item per store
+	t_storeproduce			items anyone store had ie super saver may have some that hyvee does not
+	t_producelocation		what t_storeloc anyone t_storeproduce is located at	
+
+insert into t_pshrink(f_userId, f_storeNoId, f_storeproduceid,f_qty,f_code,f_timestamp) 
+select f_userId, f_storeNoId, f_storeproduceid,f_qty,f_code,f_timestamp from T_PSHRINKBACKUP;
+
+*/
+
+DROP TABLE IF EXISTS T_STORE CASCADE;
+DROP TABLE IF EXISTS T_STORENO CASCADE;
+DROP TABLE IF EXISTS T_DEVICE CASCADE;
+
+DROP TABLE IF EXISTS T_LOGIN CASCADE;
+DROP TABLE IF EXISTS T_LOGINCODE CASCADE;
+
+DROP TABLE IF EXISTS T_STOREDEPT CASCADE;
+DROP TABLE IF EXISTS T_STOREPRODUCE CASCADE;
+DROP TABLE IF EXISTS T_STORELOC CASCADE;
+DROP TABLE IF EXISTS T_VENDOR CASCADE;
+DROP TABLE IF EXISTS T_LOCATION CASCADE;
+DROP TABLE IF EXISTS T_LOG CASCADE;
+DROP TABLE IF EXISTS T_CITYLOC CASCADE;   
+DROP TABLE IF EXISTS T_USER CASCADE;
+DROP TABLE IF EXISTS T_LANGUAGE CASCADE;
+DROP TABLE IF EXISTS T_STATE CASCADE;
+DROP TABLE IF EXISTS T_COUNTRY CASCADE;
+DROP TABLE IF EXISTS T_PRODUCE CASCADE;
+DROP TABLE IF EXISTS T_PSHRINK CASCADE;
+DROP TABLE IF EXISTS t_pshrinklog CASCADE;
+DROP TABLE IF EXISTS T_PCODE CASCADE;
+DROP TABLE IF EXISTS T_PRODUCELOCATION CASCADE;
+DROP TABLE IF EXISTS T_STOCKEDBOXES CASCADE;
+DROP TABLE IF EXISTS T_TRANSACTION CASCADE;
+DROP TABLE IF EXISTS T_EMPLOYEE CASCADE;
+DROP TABLE IF EXISTS T_SPC CASCADE;
+
+/* ----------------- Utility tables start -----------------  */
+create table T_LOG
+( 
+	f_uid           bigserial,
+	f_error	        integer default 0 not null,			
+	f_code	        integer default 0 not null,			
+	f_desc	        TEXT not null,
+	f_timestamp	    timestamp default current_timestamp,
+	primary key(f_uid)
+);
+
+/* ----------------- Utility tables end -----------------  */
+
+/* ----------------- Resource tables start -----------------  */
+/* (1,'English'),(2,'Español') */
+create table T_LANGUAGE
+(
+    f_uid           bigserial,
+    f_description   TEXT not null,
+	primary key(f_uid)
+);
+
+/* (1,'USA'),(2,'Peru') */
+create table T_COUNTRY(
+	f_uid integer,
+	f_name text,
+	primary key(f_uid)
+);
+
+create table T_STATE
+(
+	f_uid 	integer,
+	f_name	text,
+	f_country		integer default 1 not null,
+	constraint FK_STATE_CTRY foreign key(f_country) references T_COUNTRY(F_UID) on delete cascade,
+	primary key(f_uid)
+);
+
+create table T_CITYLOC
+(
+	f_uid			bigserial,
+	f_country		integer default 0 not null,
+	f_stateid		integer,
+	f_city		    text not null,
+	constraint FK_CITY_SID foreign key(f_stateid) references T_STATE(F_UID) on delete cascade,
+	primary key(f_uid)
+);
+
+create table T_LOCATION
+(   
+	f_uid           bigserial,
+	f_citylocid		bigserial,
+	f_street	    text not null,
+	f_streetno		integer default 0 not null,
+	f_zip		    integer default 0 not null,
+	constraint	FK_LOCATION_CID foreign key(f_citylocid) references T_CITYLOC(f_uid) on delete cascade,
+	primary key(f_uid)
+);
+/* ----------------- Resource tables end -----------------  */
+
+/* ----------------- User tables start -----------------  */
+
+-- values in table are in hundreds of percent so 100 = 1%
+create table t_spc
+(
+	f_uid integer not null,
+	f_ucl integer not null,
+	f_lcl integer not null,
+	f_type integer default 1 not null, -- bitmap of xyz where x is transactionId, y storeproduceis, z reject code
+	f_desc text default '' not null,
+	f_active boolean default true not null,
+	f_recordstart integer default 0 not null,
+	f_dateset		timestamp default current_timestamp,
+	f_dateend		timestamp,
+	primary key (f_uid)
+	
+);
+
+create table T_USER
+(
+    f_uid           bigserial,
+    f_email         TEXT not null,
+    f_first         TEXT not null,
+    f_last          TEXT not null,
+	f_birthday		timestamp not null,
+    f_phone         TEXT not null,
+    f_languageid    integer default 1 not null,
+    f_gender      	integer default 1 not null,		/* 0 Female, 1 Male */
+	f_mailset 		integer default 65535 not null,
+    f_type			integer default 0 not null, 	/* 0 Player */
+	f_code			integer default 0 not null, 
+	f_hasprofpic	integer default 0 not null,
+	f_dateset		timestamp default current_timestamp,
+	f_timer			timestamp,
+ 	f_logedout		timestamp,
+	f_logedin		timestamp,
+ 	f_timestamp		timestamp default current_timestamp,
+    f_password      TEXT not null,
+	primary key(f_uid)
+);
+/* ----------------- User tables end -----------------  */
+
+
+CREATE TABLE T_STORE(
+	f_uid			integer,
+	f_name			text,
+	primary key(f_uid)
+);
+
+CREATE TABLE T_STORENO(
+	f_uid		integer,
+	f_storeid	integer,
+	f_name		text,
+	constraint FK_STORENO_STID foreign key (f_storeid) references t_store(f_uid) on delete cascade,
+	primary key(f_uid)
+);
+
+CREATE TABLE T_DEVICE(
+	f_uid 			bigserial,
+	f_storeNoId		integer default -1 not null,
+	f_deptid		integer default -1 not null,
+	f_deviceMac		text default '' not null,
+	f_devicedesc	text default '' not null,
+	f_currentPass	text default '' not null,
+	f_oldPass		text default '' not null,
+	f_changed		timestamp default current_timestamp,
+	constraint FK_DEVICO_STID foreign key (f_storeNoId) references t_storeno(f_uid) on delete cascade,
+	primary key(f_uid)
+);
+
+CREATE TABLE T_STOREDEPT(
+	f_uid		integer,
+	f_storenoid	integer default 1 not null,
+	f_name		text,
+	f_order 	integer default 0 not null,
+	constraint FK_STOREDEPT_STID foreign key(f_storenoid) references t_storeno(f_uid) on delete cascade,
+	primary key(f_uid)
+);
+
+CREATE TABLE T_STORELOC(
+	f_uid		bigserial,
+	f_deptid	integer,
+	f_name		text not null default '',
+	constraint FK_STORELOC_DID foreign key (f_deptid) references t_storedept(f_uid) on delete cascade,
+	primary key(f_uid)
+);
+
+CREATE TABLE T_VENDOR(
+	f_uid		bigserial,
+	f_active 	boolean default true not null,
+	f_name		text,
+	primary key (f_uid)
+);
+
+create table T_PRODUCE
+(
+	f_uid 			text not null,		/* plu code */
+	f_commodity		text not null,
+	f_variety		text not null default '',
+	f_spcid			integer,
+	constraint FK_PRODUCE_SID foreign key(f_spcid) references T_SPC(f_uid),
+	primary key(f_uid)
+);
+
+create table T_STOREPRODUCE(
+	f_uid			bigserial,
+	f_produceid 	text not null,
+	f_vendorid		integer not null,
+	f_each			integer not null,
+	f_lb			integer not null,
+	f_casecost		integer not null, 		/* stored in cents */
+	f_unitcost		integer not null,		/* stored in cents */
+	f_retail		integer not null,		/* stored in cents */
+	f_spcid			integer,
+	constraint STOREPRODUCE foreign key(f_spcid) references T_SPC(f_uid),
+	constraint FK_STOREPRODUCE_PID foreign key(f_produceid) references T_PRODUCE(f_uid) on delete cascade,
+	constraint FK_STOREPRODUCE_VID foreign key(f_vendorid) references t_vendor(f_uid) on delete cascade,
+	primary key(f_uid)
+);
+
+CREATE TABLE T_PRODUCELOCATION(
+	f_uid				bigserial,
+	f_storeproduceid	integer,
+	f_storelocationid	integer,
+	f_qty				integer default 0 not null,
+	constraint FK_PRODUCELOCATION_PID foreign key(f_storeproduceid) references T_STOREPRODUCE(f_uid) on delete cascade,
+	constraint FK_PRODUCELOCATION_SID foreign key(f_storelocationid) references T_STORELOC(f_uid) on delete cascade,
+	primary key(f_uid)
+);
+
+create table T_PCODE
+(
+	f_uid bigserial,
+	f_storedeptid integer not null,
+	f_order 	integer default 0 not null,
+	f_storecode integer default 0 not null,
+	f_reason text,
+	f_corpcode	integer default 0 not null,	
+	constraint FK_PCODE_DID foreign key(f_storedeptid) references t_storedept(f_uid) on delete cascade,
+	primary key (f_uid)
+);
+
+create table t_transaction
+(
+	f_uid 		bigserial,
+	f_openTime	timestamp default current_timestamp,
+	f_closeTime	timestamp default current_timestamp,
+	f_comments text,
+	primary key (f_uid)
+);
+
+create table T_PSHRINK
+(
+	f_uid 				bigserial,
+	f_transactionId		integer not null,
+	f_userId			integer not null,
+	f_storeNoId			integer default 0 not null,
+	f_storeproduceid	integer not null,
+	f_qty				decimal,
+	f_code				integer,
+	f_timestamp			timestamp default current_timestamp,
+	constraint FK_PSHRINK_UID foreign key (f_userId) references t_user(f_uid) on delete cascade,
+	constraint FK_PSHRINK_STPID foreign key (f_storeproduceid) references t_storeproduce(f_uid) on delete cascade,
+	constraint FK_PSHRINK_CODE foreign key (f_code) references t_pcode(f_uid) on delete cascade,
+	constraint FK_PSHRINK_STNID foreign key (f_storeNoId) references t_storeno(f_uid) on delete cascade,
+	constraint FK_PSHRINK_TID foreign key(f_transactionId) references t_transaction(f_uid) on delete cascade,
+	primary key (f_uid)
+);
+
+create table T_PSHRINKLOG
+(
+	f_uid 				bigserial,
+	f_transactionId		integer not null,
+	f_userId			integer not null,
+	f_storeNoId			integer default 0 not null,
+	f_Itemid			integer default 0 not null,		-- Items without a valid f_storeproduceid are logged here
+	f_qty				decimal,
+	f_code				integer,
+	f_timestamp			timestamp default current_timestamp,
+	constraint FK_PSHRINKLOG_UID foreign key (f_userId) references t_user(f_uid),
+	constraint FK_PSHRINKLOG_CODE foreign key (f_code) references t_pcode(f_uid),
+	constraint FK_PSHRINKLOG_STNID foreign key (f_storeNoId) references t_storeno(f_uid),
+	constraint FK_PSHRINK_TID foreign key(f_transactionId) references t_transaction(f_uid) on delete cascade,
+	primary key (f_uid)
+);
+
+CREATE TABLE T_STOCKEDBOXES
+(
+    f_uid               bigserial,
+	f_transactionId		integer not null,
+    f_userId            integer,
+    f_boxes            	integer default 0 not null,
+    f_units            	integer default 0 not null,
+    f_tunits           	integer default 0 not null,
+    f_storeproduceid    integer,
+    f_storeNoId         integer,
+	f_timestamp			timestamp default current_timestamp,
+	constraint FK_STOCKEDBOXES_PID foreign key(f_storeproduceid) references T_STOREPRODUCE(f_uid) on delete cascade,
+	constraint FK_STOCKEDBOXES_STNID foreign key (f_storeNoId) references t_storeno(f_uid) on delete cascade,
+	constraint FK_STOCKEDBOXES_TID foreign key(f_transactionId) references t_transaction(f_uid) on delete cascade,
+    primary key(f_uid)
+);
+
+-- Note that userid and employee id are the same but a user may not be in the employee table
+create table t_employee
+(
+	f_uid			bigserial,
+	f_userid		integer unique,
+	f_admincode		integer default 0 not null,	-- Bit map Bits 0-4 Employee, Bit 5 clerical, bit 6 admin, bit 15 superuser
+	f_storenoid		integer not null,
+	f_active		boolean default true not null,
+	constraint FK_EMPLOYEE_UID foreign key(f_userid) references t_user(f_uid),
+	constraint FK_EMPLOYEE_STNID foreign key(f_storenoid) references t_storeno(f_uid),
+	primary key(f_uid)
+);
+
+create table T_LOGINCODE
+(
+	f_uid	bigserial,
+	f_code 	integer not null,
+	f_desc  text not null,
+	primary key(f_uid)
+);
+
+create table T_LOGIN
+(
+	f_uid bigserial,
+	f_codeid integer not null,
+	f_empid integer not null,
+	f_logintime timestamp default current_timestamp,
+	f_logouttime timestamp ,
+	primary key(f_uid),
+	constraint FK_LOGIN_CID foreign key(f_codeid) references T_LOGINCODE(F_UID),
+	constraint FK_LOGIN_EID foreign key(f_empid) references T_EMPLOYEE(F_UID)
+
+);
+

@@ -1,0 +1,100 @@
+body{
+    background-color: #1a9b5a;
+    color:#ffffff;
+}
+input,select
+{
+	color:#000000;
+}
+
+.clsNavDiv{margin: 20px}
+
+#idMinus{
+    padding: 24px 34px;
+    font-size: 22px; 
+}
+#idPlus {
+    padding: 24px 44px;
+    font-size: 28px; 
+}
+#idMinus,#idPlus {
+    -webkit-border-radius: 8px;
+       -moz-border-radius: 8px;
+            border-radius: 8px;
+}
+#idTotal{
+    font-size: 25px; 
+}
+.btn-smallletter{
+    margin:1px;
+    width:70px;
+    height:50px;
+    font-size: 22px;     
+}
+.btn-letter,.btn-number,.btn-symbol,.btn-alpha {
+    margin:1px;
+    width:70px;
+    height:50px;
+    font-size: 22px; 
+}
+.btn-smallletter, .btn-letter{
+    line-height: normal;
+    -webkit-border-radius: 2px;
+       -moz-border-radius: 2px;
+            border-radius: 2px;
+}
+.btn-sel{
+    padding: 5px 15px;
+    margin-top:5px;
+    width:300px;
+    text-align:left;
+    line-height: normal;
+    -webkit-border-radius: 2px;
+       -moz-border-radius: 2px;
+            border-radius: 2px;
+}
+.btn-solo{
+    width: 160px;
+    height: 80px;
+    display: inline-block;
+}
+
+.topBuffer{margin-top:5px;}
+.clsMargin5{margin:5%;}
+#idSelTable{
+    height: 550px !important;
+    overflow: scroll;
+}
+#idShrinkTable{
+    height: 150px !important;
+    overflow: scroll;
+}
+#idDone{
+    width:100%
+}
+.clsBorderBlack{
+    border:1px solid #FF6464;
+}
+#idThymeXsmall{
+    width:96px;
+    height:40px;
+}
+#idSlash{
+    display: none;
+}
+.clsAnchor{
+    width:320px;
+    margin-top:2px;
+    margin-left:10px;
+    text-align:left;
+}
+.clsAdmin1Sel{
+    width:90%;
+}
+
+#idShrinkoutLogoMp{
+    float:left
+}
+.prodFont{
+	color:white;
+}

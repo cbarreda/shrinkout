@@ -1,0 +1,206 @@
+{{ template "bootstrap" . }}
+
+{{define "bootstrap"}}
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<base href="http://localhost:8080/">		
+		<!-- -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"><link rel="stylesheet" href="static/stylesheets/bootstrap/3.4.1/bootstrap-theme.min.css">
+	
+		<script src = "./static/js/globals.js"></script><script src = "./static/js/ajax.js"></script>	
+		<link rel="stylesheet" href="./static/stylesheets/global.css">
+		
+		<script src = "/static/js/local/main0.js"></script>
+		<link rel="stylesheet" href="/static/stylesheets/local/main0.css"><link rel="stylesheet" href="/static/mp/plugins/themify-icons/themify-icons.css">
+		<title>ShrinkOut</title>
+<meta name="description" content="Meta Content here">
+<!-- Google Analytics -->
+		<!-- local header data here -->		
+		<!-- Google analytics -->	
+		{{template "localJs" .}}
+	</head>	
+	<body class="body-wrapper">
+		{{template "defaultNavBar" .}}
+		{{template "defaultContent" .}}
+	</body>
+</html>
+{{end}}
+ 
+
+{{define "defaultNavBar"}}
+<nav class="navbar main-nav fixed-top navbar-expand-lg large">
+  <div class="container">
+      <a class="navbar-brand" href="index.html"><img src="static/images/logo.png" alt="logo"></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="ti-menu text-white"></span>
+      </button>
+							<div class="form-group gclsTop20Pix">
+								<select id = "idSelectLanguage">
+									<option>Español... </option>
+									<option value=1>Inglés</option>
+									<option value=2>Español</option>
+								</select>
+								<img id="idLangFlag" src = "./static/images/spainflag.png" />
+							</div>
+      <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link scrollTo" href="#home">Portada</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link scrollTo" href="#about">Nosotros</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link scrollTo" href="#team">Equipo</a>
+        </li>
+      </ul>
+      </div>
+  </div>
+</nav>
+{{end}}
+{{define "localJs"}}
+	<script>
+	</script>
+
+{{end}}
+{{define "defaultContent"}}
+<!--=====================================
+=            Homepage Banner            =
+======================================-->
+
+<section class="banner bg-1" id="home">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 align-self-center">
+				<!-- Contents -->
+				<div class="content-block">
+					<h1>MEJOR PRODUCTO<br>A MENOR COSTO</h1>
+					<h5>ShrinkOut provee a los administradores con las herramientas para mejorar el producto que venden y para controlar y bajar los rechazos.</h5>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="image-block">
+					<img class="img-fluid phone-thumb" src="static/images/phones/phonelogin.png" alt="login-screen">
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!--====  End of Homepage Banner  ====-->
+
+<!--===========================
+=            About            =
+============================-->
+
+<section class="about section bg-2" id="about">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-6 align-self-center text-center">
+				<!-- Image Content -->
+				<div class="image-block">
+					<img class="phone-thumb-md" src="static/images/phones/phonedata.png" alt="iphone-feature" class="img-fluid">
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-10 m-md-auto align-self-center ml-auto">
+				<div class="about-block">
+					<!-- About 01 -->
+					<div class="about-item one">
+						<div class="icon">
+							<i class="ti-palette"></i>
+						</div>
+						<div class="content">
+							<h5>Diseño Inovativo</h5>
+							<p>Los celulares estan montados en los carros, facilitando a que los empleados entren la informacion..</p>
+						</div>
+					</div>
+					<!-- About 02 -->
+					<div class="about-item active">
+						<div class="icon">
+							<i class="ti-panel"></i>
+						</div>
+						<div class="content">
+							<h5>Facíl de usar</h5>
+							<p>En nuestras pruebas los empleados entran información en segundos. El impacto en la mano de obra es insignificante..</p>
+						</div>
+					</div>
+					<!-- About 03 -->
+					<div class="about-item two">
+						<div class="icon">
+							<i class="ti-vector"></i>
+						</div>
+						<div class="content">
+							<h5>La información que necesita para administrar su negocio</h5>
+							<p>Usando ShrinkOut usted puede ver quien abasteció, cuanto abastecieron, cuanto tiempo tomo, cuanto rechazaron, porque lo rechazaron, quién fué el productor y mucho mas..</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!--====  End of About  ====-->
+
+
+<!--==========================
+=            Team            =
+===========================-->
+
+<section class="section team bg-shape-two" id="team">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="section-title mb-4">
+					<h2 class="mb-3">Nuestro Equipo Creativo</h2>
+					<p>Una combinación de tecnología, emprendimiento, y base de negocios.</p>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4 col-md-6">
+				<!-- Team Member -->
+				<div class="team-member cb text-center mb-4 mb-lg-0">
+					<div class="image">
+						<img class="img-fluid" src="static/images/team/member-one.jpg" alt="team-member">
+					</div>
+					<div class="name">
+						<h5>Carlos Barreda</h5>
+					</div>
+					<div class="position">
+						<p>Fundador</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!--====  End of Team  ====-->
+
+<!--============================
+=            Footer            =
+=============================-->
+
+<footer class="footer-main">
+  <div class="container">
+    <div class="row">
+      <div class="col" align="center">
+		<!--a href = "mailto: sales@shrinkout.com">Mandenos un correo electronico</a-->
+      </div>
+    </div>
+  </div>
+</footer>
+{{end}}
+
+
+
+
+

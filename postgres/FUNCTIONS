@@ -1,0 +1,1139 @@
+	
+/* Target for deletion may 20 2018
+CREATE OR REPLACE FUNCTION SP_SETDEVICE(
+	p_iUserId 		integer,
+	p_sPassword		text,
+	p_iStoreNoId	integer,
+	p_iStoreDeptId	integer,
+	p_sMac			text,
+	p_sDesc			text
+)
+RETURNS TEXT AS $$
+DECLARE
+	iCode	integer;
+	iStore  integer;	
+	sNewPass text;
+	sOldPass text;
+	sTemp	 text;	
+BEGIN 
+	iCode = -1;
+	iStore = -10;
+	sNewPass = 'passx';
+	sOldPass = 'passy';
+
+    select f_uid from t_user where f_uid = p_iUserId and  f_password = crypt(p_sPassword,f_password) into p_iUserId;
+    if (p_iUserId is  not null) then
+		select f_deviceMac from t_device where f_deviceMac = p_sMac into sTemp;
+		
+		if sTemp is null then
+			insert into t_device(f_storenoid,f_deviceMac,f_devicedesc,f_deptid,f_currentPass,f_oldpass) 
+				values(p_iStoreNoId,p_sMac,p_sDesc,p_iStoreDeptId,sNewPass,sOldPass) returning f_storeNoId into iCode;
+		else
+			update t_device set f_storeNoId = p_iStoreNoId,
+					f_devicedesc = p_sDesc,f_deptid=p_iStoreDeptId,
+					f_currentPass = sNewPass, f_oldpass = sOldPass
+				 where f_deviceMac = p_sMac returning f_storeNoId into iCode;
+		end if;
+
+		if iCode is null then
+			iCode = -2;
+		elseif iCode > 0 then
+			select s.f_uid from t_store s, t_storeno n where s.f_uid = n.f_storeid and n.f_uid = p_iStoreNoId into iStore; 
+			if iStore is null then	
+				iStore = -13;
+				iCode = -3;
+			end if;
+		end if;		
+   	end if;
+ 	return '{"code":' || iCode ||',"pass":"' || sNewPass || '","store":' || iStore || '}';
+END;
+$$ LANGUAGE plpgsql;
+*/
+
+/* Following will list all functions. Copy to geany, remove quotes and run on pgadmin or plpgsql
+SELECT 'drop function ' || proname 
+       || '(' || oidvectortypes(proargtypes) || ');'
+FROM pg_proc INNER JOIN pg_namespace ns ON (pg_proc.pronamespace = ns.oid)
+WHERE ns.nspname = 'public' and ((proname like 'sp_%')or(proname like 'ip_%'))  order by proname;
+*/
+CREATE OR REPLACE FUNCTION SP_GETERROR(
+    intErrorId integer, intLanguage integer
+) 
+returns text as $$
+DECLARE
+    strError text;
+BEGIN
+    select f_error from t_error where (f_languageid=intLanguage) and (f_errorid = intErrorId) into strError;
+    if (strError is null) then
+        strError = '';
+    end if;
+    return strError;
+END;
+$$ LANGUAGE plpgsql;
+
+
+/*************************************** UTIL START END *****************************************************/
+create or replace function html_table (query text)
+returns setof text language plpgsql as $$
+declare
+    rec record;
+    header boolean := true;
+begin
+   
+    for rec in 
+        execute format($q$
+            select row_to_json(q) json_row 
+            from (%s) q
+            $q$, query)
+    loop
+        if header then
+            return query select 
+                format ('<tr><th>%s</th></tr>', string_agg(key, '</th><th>')) 
+            from json_each(rec.json_row);
+            header := false;
+        end if;
+        return query select 
+            format ('<tr><td>%s</td></tr>', string_agg(value, '</td><td>'))
+        from json_each_text(rec.json_row);
+    end loop;
+    return next '</table>';
+end $$;
+
+create or replace function csv_table (
+	query text
+)
+returns setof text language plpgsql as $$
+declare
+    rec record;
+    header boolean := true;
+begin   
+    for rec in 
+        execute format($q$
+            select row_to_json(q) json_row 
+            from (%s) q
+            $q$, query)
+    loop
+        if header then
+            return query select 
+                format ('%s', string_agg(key, ',')) 
+            from json_each(rec.json_row);
+            header := false;
+        end if;
+        return query select 
+            format ('%s', string_agg(value, ','))
+        from json_each_text(rec.json_row);
+    end loop;
+    return next '</table>';
+end $$;
+
+CREATE OR REPLACE FUNCTION SP_EXECUTESQL(
+	sSql text
+) returns text as $$
+BEGIN
+	execute(sSql);
+	return '0';
+END;
+$$ LANGUAGE plpgsql;
+
+/*************************************** UTIL END *****************************************************/
+
+/*************************************** USER BEGIN *****************************************************/
+CREATE OR REPLACE FUNCTION SP_SETDEVICE(
+	p_iUserId 		integer,
+	p_sPassword		text,
+	p_iStoreNoId	integer,
+	p_iStoreDeptId	integer,
+	p_sMac			text,
+	p_sDesc			text
+)
+RETURNS TEXT AS $$
+DECLARE
+	iCode	integer;
+	iStore  integer;	
+	sNewPass text;
+	sOldPass text;
+	sTemp	 text;	
+BEGIN 
+	iCode = -1;
+	iStore = -10;
+	sNewPass = 'passx';
+	sOldPass = 'passy';
+
+    select f_uid from t_user where f_uid = p_iUserId and  f_password = crypt(p_sPassword,f_password) into p_iUserId;
+    if (p_iUserId is  not null) then
+
+		select s.f_uid from t_store s, t_storeno n where s.f_uid = n.f_storeid and n.f_uid = p_iStoreNoId into iStore; 
+		if iStore is null then	
+			iStore = -10;
+			iCode = -2;
+		else
+
+			select f_deviceMac from t_device where f_deviceMac = p_sMac into sTemp;
+		
+			if sTemp is null then
+				insert into t_device(f_storenoid,f_deviceMac,f_devicedesc,f_deptid,f_currentPass,f_oldpass) 
+					values(p_iStoreNoId,p_sMac,p_sDesc,p_iStoreDeptId,sNewPass,sOldPass) returning f_storeNoId into iCode;
+			else
+				update t_device set f_storeNoId = p_iStoreNoId,
+					f_devicedesc = p_sDesc,f_deptid=p_iStoreDeptId,
+					f_currentPass = sNewPass, f_oldpass = sOldPass
+				 where f_deviceMac = p_sMac returning f_storeNoId into iCode;
+			end if;
+
+			if iCode is null then
+				iCode = -3;
+			end if;		
+		end if;
+   	end if;
+ 	return '{"code":' || iCode ||',"pass":"' || sNewPass || '","store":' || iStore || '}';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_FORGOTPASSWORD(
+    p_uid   integer
+)
+RETURNS text as $$
+DECLARE
+    strReturn TEXT;
+    strEmail TEXT;
+BEGIN
+    select f_email,substring(f_password,8,5) from t_user where f_uid = p_uid into strEmail,strReturn;    
+    if(length(strReturn) > 0) then
+        update t_user set f_password = crypt(strReturN , gen_salt('bf')) where f_uid = p_uid;
+     end if;
+    
+    return strEmail || ',' ||  strReturn;    
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_CHANGEPASSWORD(
+    p_uid       integer,
+    p_oldPass   text,
+    p_newPass   text
+)
+RETURNS text as $$
+DECLARE
+    strReturn TEXT;
+BEGIN
+    select f_uid from t_user where f_uid = p_uid and  f_password = crypt(p_oldPass,f_password) into strReturn;
+    if (strReturn is null) then
+        strReturn = "-9";
+    else
+        update t_user set f_password = crypt(p_newPass , gen_salt('bf')) where f_uid = p_uid;
+        strReturn = '';
+    end if;
+    
+    return strReturn;    
+END;
+$$ LANGUAGE plpgsql;
+
+/* p_uid < 0 delete absolute, 0 add, > 0 update */
+CREATE OR REPLACE FUNCTION SP_ADDUSER(
+	p_userId     	integer,	
+	p_email         text,	    
+	p_first         text,       
+	p_last          text,       
+	p_birthday		text,  
+	p_phone         text,       
+	p_languageid    integer,    
+	p_gender      	integer,    
+    p_type			integer,    
+    p_code			integer,	
+	p_password      text       
+)
+RETURNS text As $$
+DECLARE 
+	intUid 			integer;
+    intTemp 		integer;
+    intReturn		integer;
+BEGIN	
+	intUid = abs(p_userId);
+	intReturn = -1;	
+	
+	if (p_userId < 0) then
+		delete from t_user where f_uid = intUid ;
+	else 
+		begin
+			if (intUid > 0) then /* Edit */
+				update t_user set f_email = lower(p_email),f_first = p_first,f_last = p_last,f_birthday = p_birthday,
+				f_phone = p_phone,f_languageid=p_languageid,f_gender = p_gender,f_type = p_type,f_code = p_code
+				where f_uid = intUid;
+				intReturn = 0;
+			
+			else
+				select f_uid, crypt(p_password,f_password), f_Password from t_user where f_email = lower(p_email) or f_phone = p_phone into intUid;
+					
+				if(intUid is null)  then /* New User */    
+					insert into t_user(f_email,f_first,f_last,f_birthday,f_phone,f_languageid,f_gender,
+						f_type,f_code,f_password) 
+					values (lower(p_email),p_first,p_last,to_timestamp(p_birthday,'YYYY/MM/DD'), p_phone,p_languageid,p_gender,
+						p_type,p_code,crypt(p_password , gen_salt('bf'))) returning f_uid into intUid ; 
+					
+					if (intUid is null) then
+						intReturn = -3; /* Insert Failed */
+					else
+						intReturn = intUid;					
+					end if;
+				else 
+					intReturn = -2; /* Another user already has the e-mail  or phone */
+				end if;
+			end if;	
+		end;
+	end if;
+	
+   return (intReturn);    
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_EMPBYID(
+	iEmpId integer,
+	iStoreId integer
+)
+RETURNS text as $$
+DECLARE sReturn text;
+BEGIN
+	select json_build_object('f_uid',t_user.f_uid,'f_email',t_user.f_email,'f_first',t_user.f_first,'f_last',t_user.f_last,
+		'f_birthday',t_user.f_birthday,'f_languageid',t_user.f_languageid,'f_gender',t_user.f_gender,'f_type',t_user.f_type,
+		'f_code',t_user.f_code,'f_admincode',t_employee.f_admincode,'f_employeeid',t_employee.f_uid) as sReturn
+	from t_user
+	left join t_employee on t_user.f_uid = t_employee.f_userid and t_employee.f_storenoid = iStoreId
+	where t_employee.f_uid = iEmpId 
+	into sReturn;
+	
+	if sReturn is null then
+		sReturn = '';
+	end if;
+	
+	return (sReturn);	
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_EMPBYID(
+	iEmpId integer,
+	iStoreId integer,
+	sPassword text
+)
+RETURNS text as $$
+DECLARE sReturn text;
+BEGIN
+	select json_build_object('f_uid',t_user.f_uid,'f_email',t_user.f_email,'f_first',t_user.f_first,'f_last',t_user.f_last,
+		'f_birthday',t_user.f_birthday,'f_languageid',t_user.f_languageid,'f_gender',t_user.f_gender,'f_type',t_user.f_type,
+		'f_code',t_user.f_code,'f_admincode',t_employee.f_admincode,'f_employeeid',t_employee.f_uid) as sReturn
+	from t_user
+	left join t_employee on t_user.f_uid = t_employee.f_userid and t_employee.f_storenoid = iStoreId
+	where t_employee.f_uid = iEmpId and f_password = crypt(sPassword,f_password)
+	into sReturn;
+	
+	if sReturn is null then
+		sReturn = '';
+	end if;
+	
+	return (sReturn);
+	
+END;
+$$LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION SP_LOGIN(
+	iLoginCode	integer,
+	iStoreId	integer,
+	iEmpId	integer,
+	sPassword 	text
+)
+RETURNS text as $$
+DECLARE 
+	sReturn text;
+	sJson	text;
+BEGIN
+	sReturn = '-1';
+	
+	if length(sPassword) > 0 then
+		sJson = SP_EMPBYID(iEmpId,iStoreId,sPassword);
+	else
+		sJson = SP_EMPBYID(iEmpId,iStoreId);
+	end if;
+
+	if length(sJson) > 0 then
+		sReturn = '-2';
+		sReturn = SP_LOGOUT(-1,iEmpId);
+		insert into T_LOGIN(f_codeid,f_empid) values(iLoginCode,iEmpId) returning f_uid into sReturn;
+		if sReturn is null then
+			sReturn = '-3';
+		else
+			sReturn = sJson;					
+		end if;
+	end if;
+	return sReturn;	
+END;
+$$ LANGUAGE plpgsql;	
+	
+CREATE OR REPLACE FUNCTION SP_LOGOUT(
+    iUserId  integer,
+	iEmpId integer
+)
+RETURNS  text as $$
+DECLARE sDummy text;
+BEGIN
+	update T_LOGIN set f_logouttime = NOW() where f_empid = iEmpId and f_logouttime is null;
+	if iUserId > 0 then
+		sDummy = SP_LOGOUT(iUserId);
+	end if;
+    return 0;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_LOGOUT(
+    iUserId  integer
+)
+RETURNS  text as $$
+BEGIN
+    delete from t_session where f_userid = iUserId;
+    return '';
+END;
+$$ LANGUAGE plpgsql;
+/*************************************** USER END *****************************************************/
+
+/*************************************** PRODUCE BEGIN *****************************************************/
+CREATE OR REPLACE FUNCTION SP_GETSTOREPRODUCEIDS(
+	sProduceId		text
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+	objR record;	
+BEGIN
+	sReturn = '';
+	for objR in
+		select sp.f_uid, sp.f_vendorid, v.f_name from t_storeproduce sp, t_vendor v 
+			where sp.f_produceid = sProduceId and (v.f_uid = sp.f_vendorid) order by f_vendorid
+	loop
+		if length(sReturn) > 0 then
+			sReturn = sReturn || ',';
+		end if;
+		sReturn = sReturn || '[' || objR.f_uid || ',' || objR.f_vendorid || ',"' || objR.f_name || '"]';
+	end loop;
+
+	return '[' || sReturn || ']';	
+END;
+$$LANGUAGE plpgsql;
+
+/* SP_SETSTORE Output 
+	f1 t_producelocation.f_produceid,f2 t_produce.f_commodity,
+	f3 t_storedept.f_name,f4 t_storedept.f_order,f5 t_storeloc.f_uid
+	f6 t_storeproduce.f_produceid,f7 t_storeloc.f_name
+
+	f1 t_produce.f_commodity,f2 t_produce.f_uid,f3 t_storedept.f_uid,f4 t_storeloc.f_uid
+	f5 t_storedept.f_name,f6 t_storeloc.f_name
+*/
+
+CREATE OR REPLACE FUNCTION SP_SETSTORE(
+	iStoreId integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+	objR		RECORD;	
+BEGIN
+	sReturn = '';
+	for objR in 
+		select  array_to_json(array_agg(distinct row(t_produce.f_commodity,t_produce.f_uid,
+			t_storedept.f_uid,t_storedept.f_order,t_storeloc.f_uid,t_storedept.f_name,t_storeloc.f_name))) as jr
+		from  t_storedept 
+			left join t_storeloc on t_storeloc.f_deptid = t_storedept.f_uid 
+			left join T_PRODUCELOCATION on T_PRODUCELOCATION.f_storelocationid = t_storeloc.f_uid
+			left join t_storeproduce on t_storeproduce.f_uid = T_PRODUCELOCATION.f_storeproduceid
+			left join t_produce on t_storeproduce.f_produceid = t_produce.f_uid
+			left join t_vendor on t_storeproduce.f_vendorid = t_vendor.f_uid
+		where (t_storedept.f_storenoid = iStoreId) and (t_produce.f_commodity is not null)
+		group by t_storedept.f_UID,t_storedept.f_order,t_storeloc.f_name,t_produce.f_commodity
+		order by t_storedept.f_UID,t_storedept.f_order,t_produce.f_commodity,t_storeloc.f_name			
+	Loop
+		if ( length(sReturn)) > 0 then	
+			sReturn = sReturn || ',';
+		end if;
+		sReturn = sReturn || objR.jr;
+	end loop;
+
+	if (length(sReturn) > 0) then
+		sReturn = '{"Store":[' || sReturn || ']}';
+	end if;
+	return(sReturn);
+END;
+$$language plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_ORPHANS(
+	pLocId	 integer
+)
+RETURNS TEXT AS $$
+BEGIN
+	insert into T_PRODUCELOCATION(f_storelocationid,f_storeproduceid) 
+	(select pLocId,t_storeproduce.f_uid		
+		from t_storeproduce		
+		left join t_producelocation on T_PRODUCELOCATION.f_storeproduceid = t_storeproduce.f_uid 
+		where T_PRODUCELOCATION.f_storeproduceid  is null);
+	return '';
+END;
+$$LANGUAGE plpgsql;
+
+/* SP_STOREBYEMP Output where 1 and 4 are t_employee.f_storenoid
+	'{"stores":[1,4],"inv":0}' */
+CREATE OR REPLACE FUNCTION SP_STOREBYEMP(
+	iUserId integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+BEGIN
+	sReturn = '';
+
+	select '[' || f_storenoid || ',' || f_admincode || ']' from t_employee where f_userid = iUserId into sReturn;
+	if (sReturn is null) then
+		sReturn = '';
+	end if;
+	return '{"stores":' || sReturn  || '}';
+END;
+$$language plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_CODELIST(
+	iStoreDeptId	integer	
+)
+RETURNS TEXT AS $$
+DECLARE
+	strReturn 	text;
+	objR		RECORD;	
+BEGIN
+	strReturn = '';
+	for objR in 
+		Select row_to_json(row(f_uid, f_storecode,f_reason )) as jr
+--		Select f_uid, f_storecode || ', ' || f_reason as dReason
+		from t_pcode where f_storedeptid = iStoreDeptId
+		order by f_uid
+		Loop
+			if length(strReturn) > 0 then
+				strReturn = strReturn || ',';
+			end if;
+			strReturn = strReturn || objR.jr;
+			
+			-- strReturn = strReturn || '<Option value=' || objR.f_uid || '>' || objR.dReason|| '</option>';
+		end loop;	
+	
+	return '[' || strReturn || ']';
+END;
+$$language plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_PRODUCELIST(	
+)
+RETURNS TEXT AS $$
+DECLARE
+	strReturn 	text;
+	objR		RECORD;	
+BEGIN
+	strReturn = '';
+	for objR in 
+		Select f_uid, f_commodity, f_variety 
+		from t_produce order by f_commodity,f_variety
+		Loop
+			strReturn = strReturn || '<Option value = ''' || objR.f_uid || '''>' || objR.f_commodity || 
+				' ' || objR.f_variety || '</option>';
+		end loop;	
+	
+	return strReturn;
+END;
+$$language plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_GETTRANSACTIONID(
+	s_comments	text
+)
+returns text as $$
+DECLARE
+	iReturn integer;
+BEGIN
+	insert into t_transaction(f_comments) values (s_comments) returning f_uid into iReturn;
+	return iReturn;
+END;
+$$language plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_ADDBOXES(
+	p_timestamp				timestamp,
+	p_userId				integer,
+	p_storeId				integer,
+	p_storeproduceId		integer,
+	p_boxes					integer,
+	p_units					integer,
+	p_transactionId			integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	iReturn integer;
+BEGIN
+	if p_storeproduceId > 0 then
+		insert into T_STOCKEDBOXES(f_userId,f_storeproduceid,f_boxes,f_units,f_storeNoId,f_transactionid,f_timestamp,f_tunits)
+			values (p_userId, p_storeproduceId,p_boxes,p_units,p_storeId,p_transactionId,p_timestamp,
+			(select (f_each * p_boxes) + p_units from t_storeproduce where f_uid = p_storeproduceId));
+	end if;
+
+	return '{"Boxes": || p_boxes || "Units":' || p_units || ',"PLU":' || p_storeproduceId || '}';
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_ADDSHRINK(
+	p_timestamp				timestamp,
+	p_userId				integer,
+	p_storeId				integer,
+	p_storeproduceId		integer,
+	p_qty					numeric,
+	p_code					integer,
+	p_transactionId			integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	iReturn integer;
+BEGIN
+	select s.f_uid ,s.f_vendorid
+	from  T_STOREPRODUCE s, T_STOREPRODUCE x
+	where s.f_produceid = x.f_produceid and s.f_vendorid =1
+	and x.f_uid = p_storeproduceId INTO iReturn;
+
+	if iReturn is not null then
+		if p_storeproduceId > 0 then
+			insert into t_pshrink(f_userId,f_storeproduceid,f_qty,f_code,f_storeNoId,f_transactionid,f_timeStamp) 			
+				values (p_userId,p_storeproduceId,p_qty,p_code,p_storeId,p_transactionId,p_timeStamp);
+		else
+			insert into t_pshrinklog(f_userId,f_Itemid,f_qty,f_code,f_storeNoId,f_transactionid,f_timeStamp) 
+				values (p_userId,p_storeproduceId,p_qty,p_code,p_storeId,p_transactionId,p_timeStamp);
+		end if;
+	else
+		iReturn = 0;
+	end if;
+
+	return '{"Qty":' || p_qty || ',"PLU":' || iReturn || ',"Code":' || p_code || '}';
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_SHRINKDONE(
+	p_timestamp				timestamp,
+	p_userId				integer,
+	p_storeId				integer,
+	p_storeproduceId		integer,
+	p_code					integer,
+	p_qty					numeric,
+	p_transactionId			integer,
+	p_spcCode				integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	iReturn integer;
+	iFuid integer;
+	sReturn text;
+	iSPC	int;
+BEGIN
+	iSPC = 0;	
+
+	if p_storeproduceId > 0 then
+		insert into t_pshrink(f_userId,f_storeproduceid,f_qty,f_code,f_storeNoId,f_transactionid,f_timeStamp) 		
+			values (p_userId, p_storeproduceId,p_qty,p_code,p_storeId,p_transactionId,p_timeStamp) returning f_uid into iFuid;
+			
+		select SP_GETSPCID(p_storeproduceId,p_spcCode) into iSPC;
+	else
+		insert into t_pshrinklog(f_userId,f_Itemid,f_qty,f_code,f_storeNoId,f_transactionid,f_timeStamp) 		
+			values (p_userId, p_storeproduceId,p_qty,p_code,p_storeId,p_transactionId,p_timeStamp)  returning f_uid into iFuid;
+	end if;
+
+	if iFuid is null then
+		iFuid = -1;
+		iSPC = 0;
+	end if;
+
+	return '{"p_storeproduceId":' || p_storeproduceId || ',"code":' || p_spcCode || ',"UID":' || iFuid || ',"SPCID":' || iSPC || '}';	
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_GETSPCID(
+	p_uid int,
+	p_code int			-- 0 from t_produce, 1 from t_storeproduce 
+)
+RETURNS TEXT AS $$
+DECLARE
+	iSpSPC 	int;
+	iPrSPC  int;
+	iSPC 	int;
+BEGIN
+	iSPC = 0;
+	select s.f_spcid,  p.f_spcid from t_storeproduce s, t_produce p where s.f_uid = p_uid and s.f_produceid = p.f_uid into iSpSPC,iPrSPC;
+	if (p_code = 0) then
+		iSpSPC =0;
+		if iPrSPC is null then
+			iPrSPC =0;
+		else
+			iSPC = iPrSPC;
+		end if;
+	else
+		if iSpSPC is null then
+			iSPC = 0;
+		else
+			iSPC = iSpSPC;
+		end if;
+	end if;
+	return iSPC;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_GETSPC(
+	p_uid int,
+	p_code int			-- 0 from t_produce, 1 from t_storeproduce 
+)
+RETURNS TEXT AS $$
+DECLARE
+	sRet	text;
+	sSql 	text;
+	sPts	text;
+	iSPC 	int;
+	iucl 	int;
+	ilcl	int;
+	itype 	int;
+	iQty	int;
+	rec 	record;		
+BEGIN
+	sRet = '';
+	iSPC = 0;
+	iucl = 0;
+	
+	select SP_GETSPCID(p_uid,p_code) into iSPC;
+		
+	if iSPC > 0 then
+		select f_ucl, f_lcl, f_type from t_spc where f_uid = iSPC into iucl, ilcl, itype ;
+		if (iucl is null)  then
+			iucl = 0;
+		else
+			sRet = '{"spcId":' || iSPC || ',"ucl":' || iucl  || ',"lcl":' || ilcl  || ',"type":' || itype  || ',"points":[';
+			sPts = '';
+			for rec in 
+				execute 'select f_transactionid,sum(f_tunits) units from t_stockedboxes group by f_transactionid order by f_transactionid desc limit 25'
+			loop
+				sSQL = 'select sum(f_qty) from t_pshrink where f_transactionId = ' || rec.f_transactionId;
+				execute sSQL into iQty;
+				if iQty is null then
+					iQty  = -1;
+				end if;
+	
+				if (length(sPts) > 0) then
+					sPts = sPts || ',';
+				end if;
+		
+				sPts =  sPts || '[' ||  rec.f_transactionId || ',' || rec.units || ',' || iQty || ']';
+			end loop;
+			sRet = sRet || sPts || ']}';
+		end if;
+	end if;
+	return sRet;
+end;
+$$ language plpgsql;
+		
+CREATE OR REPLACE FUNCTION SP_GETSTORELOC(
+	p_storeId	int
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+	sLoc text;	
+	objR record;
+BEGIN
+	sLoc = '';
+	for objR in 
+		Select l.f_uid uid, d.f_name || '/' || l.f_name dname 
+		from t_storeloc l, t_storedept d where d.f_uid = l.f_deptid and d.f_storenoid = p_storeId
+		order by d.f_name,l.f_name 
+	Loop
+		if (length(sLoc) > 0) then
+			sLoc = sLoc || ',';
+		end if;
+		sLoc = sLoc || '["' || objR.uid || '","' || objR.dname || '"]';
+	End Loop;
+
+	if (length(sLoc) > 0) then
+		sReturn = '[' || sLoc || ']';
+	end if;
+
+	return sReturn;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_PRODUCTLOCATION(
+	p_storeId	int
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+	sLoc text;	
+	objR record;
+BEGIN
+	sReturn = '';
+	for objR in select distinct min(f_uid) minFuid,f_itemid from t_pshrinklog 
+		where f_storeNoId = p_storeid group by f_itemid
+	Loop
+		if (length(sReturn) > 0) then
+			sReturn = sReturn  || ',';
+		end if;
+		sReturn = sReturn || '[' || objR.minFuid || ',' || objR.f_itemid || ']';
+	end loop;
+
+	if (length(sReturn) > 0) then
+		select * from SP_GETSTORELOC(p_storeid) into sLoc;
+		sReturn = '{' || '"slAr":[' || sReturn || '],"locAr":' || sLoc || '}';
+	end if;
+
+	return sReturn;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_GETSHRINKLOG(
+	p_storeId	int
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+	sLoc text;	
+	objR record;
+BEGIN
+	sReturn = '';
+	for objR in select distinct min(f_uid) minFuid,f_itemid from t_pshrinklog 
+		where f_storeNoId = p_storeid group by f_itemid
+	Loop
+		if (length(sReturn) > 0) then
+			sReturn = sReturn  || ',';
+		end if;
+		sReturn = sReturn || '[' || objR.minFuid || ',' || objR.f_itemid || ']';
+	end loop;
+
+	if (length(sReturn) > 0) then
+		select * from SP_GETSTORELOC(p_storeid) into sLoc;
+		sReturn = '{' || '"slAr":[' || sReturn || '],"locAr":' || sLoc || '}';
+	end if;
+
+	return sReturn;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_PRODREPORT(
+	sFrom	text,
+	sTo		text,
+	iType	integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+	sSql text;
+BEGIN
+	sReturn = '';
+	
+	if (iType = 1) then
+		sSql = 'select  u.f_first  ||  u.f_last Emp,	s.f_qty Qty,s.f_timestamp DateTime,' ||
+			'p.f_uid PLU, p.f_cents/100 Dollars,p.f_lbs/100 Lbs,f_commodity Commodity,f_variety Variety, f_size Size' ||
+			' from t_pshrink s, t_user u, t_produce p' ||
+			' where (s.f_userid = u.f_uid) and (s.f_produceId = p.f_uid)' ||
+				' and (s.f_timestamp >= ''' || sFrom || ''') and (s.f_timestamp <= ''' || sTo || ''')';	
+	end if;
+	
+	return html_table(sSql);
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_ADDPLU(
+	p_plu		text,
+	p_desc		text,
+	p_loc		integer,
+	p_each		integer,
+	p_lb		integer,
+	p_case		decimal,
+	p_unit		decimal,
+	p_retail	decimal,
+	p_vendor	integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+	iTemp	int;
+	iCode	int;
+	s_plu 	text;
+BEGIN
+	iCode = -1;
+
+	select f_uid from t_vendor into iTemp;
+	
+	if(iTemp is not null) then
+		s_plu = p_plu::text;
+		select f_uid from t_storeproduce where f_produceid = s_plu into iTemp;
+
+		if (iTemp is null) then
+			select f_uid from t_produce where f_uid = s_plu into iTemp;
+
+			if (iTemp is null) then
+				insert into t_produce(f_uid,f_commodity)values(s_plu,p_desc);
+			end if;		
+			insert into t_storeproduce(f_produceid,f_vendorid,f_each,f_lb,f_casecost,f_unitcost,f_retail) values
+				(s_plu,p_vendor,p_each,p_lb,round(p_case * 100),round(p_unit * 100),round(p_retail * 100));
+			iCode = 0;
+		else
+			update t_produce set f_commodity = p_desc where f_uid = s_plu;
+			update t_storeproduce set f_vendorid = p_vendor, f_each = p_each, f_lb = p_lb, 
+				f_casecost = round(p_case * 100),f_unitcost = round(p_unit * 100), f_retail= round(p_retail * 100)
+			    where f_produceid = s_plu;
+			iCode = 1;
+		end if;
+	end if;
+
+	return '{"Code":' || iCode ||'}';
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_PROCESSLOGFILE(
+			p_storenoid	integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+	iReturn integer;
+BEGIN
+	sReturn = '';
+
+	select count(*)
+		from t_storeproduce p,t_pshrinklog l 
+		where p.f_produceid = abs(l.f_itemid)::text and (l.f_storenoid = p_storenoid) into iReturn;
+
+	if (iReturn is null ) then	
+		iReturn = 0;
+	else
+	
+		insert into t_pshrink(f_userid,f_storenoid,f_storeproduceid,f_qty,f_code) 
+		(
+			select l.f_userid,l.f_storenoid,p.f_uid,l.f_qty,l.f_code
+			from t_storeproduce p,t_pshrinklog l 
+			where p.f_produceid = abs(l.f_itemid)::text and (l.f_storenoid = p_storenoid)
+		);
+
+		delete from t_pshrinklog where f_uid in(
+			select l.f_uid
+			from t_storeproduce p,t_pshrinklog l 
+			where p.f_produceid = abs(l.f_itemid)::text and (l.f_storenoid = p_storenoid)
+		);
+	end if;
+
+	return '{"code":' || iReturn || '}';
+END;
+$$LANGUAGE plpgsql;
+
+/*************************************** PRODUCE END *****************************************************/
+
+/**************************************** GENERIC FUNCTIONS START **************************************/
+CREATE OR REPLACE FUNCTION SP_ADDCITYLOC(
+	p_country 	integer,
+    p_state   	integer,
+    p_city    	text
+)
+RETURNS TEXT AS $$
+DECLARE
+    intLocationId integer;
+BEGIN
+	intLocationId = -8001;
+    if(length(lower(trim(p_city))) < 1) then
+		intLocationId = 0;
+	else
+		select f_uid from T_CITYLOC
+			where (f_country = p_country) and (f_state = p_state ) and (f_city = p_city) 		
+			into intLocationId;
+			
+		if (intLocationId is null) then
+			insert into T_CITYLOC(f_country,f_state,f_city) 
+			values (p_country,p_state,p_city) 
+			returning f_uid into intLocationId;
+		end if;    
+	end if;
+	
+	return intLocationId;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_GETPRODLOCATION(
+	iStoreNoId integer
+)
+returns text as $$
+DECLARE
+	sReturn text;
+	objRet	record;
+BEGIN
+	sReturn = '';
+	for objRet in 
+		select json_build_object (
+			'locUid', l.f_uid, 'locName',l.f_name,'deptName',d.f_name,
+			'prodlocUid',t.f_uid,'prodUid',p.f_uid,'commodity',
+			p.f_commodity
+			) jr
+		from  t_storeloc l
+		left join t_producelocation t on (t.f_storelocationid = l.f_uid)
+		left join t_storedept d on (l.f_deptid = d.f_uid)
+		left join t_storeproduce o on (t.f_storeproduceid = o.f_uid)
+		left join t_produce p on (o.f_produceid  = p.f_uid) 
+		where (d.f_storenoid = iStoreNoId)
+		order by p.f_commodity	 
+	Loop
+		if length(sReturn) > 0 then
+			sreturn = sReturn || ',';
+		end if;
+		sReturn = sReturn || objRet.jr;
+	End Loop;
+
+	sReturn = '{"producelocation":[' || sReturn || ']}';
+	return sReturn;	
+END;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_ADDLOCATION(
+	p_country 	integer,
+    p_state   	integer,
+    p_city    	text,
+    p_street  	text,
+	p_streetno 	integer,
+    p_zip     	integer
+)
+RETURNS TEXT AS $$
+DECLARE
+    intLocationId integer;
+    intCityLocationId integer;
+BEGIN
+	intCityLocationId = SP_ADDCITYLOC(p_country,p_state,p_city);
+	if(intCityLocationId > 0) then	
+		intLocationId = -8000;
+		if(length(p_street) < 1) then
+			intLocationId = 0;
+		else
+			select f_uid from t_location 
+				where (f_citylocid = intCityLocationId) and (f_street = lower(trim(p_street))) and (f_streetno = p_streetno) 
+					and (f_zip = p_zip) 				
+				into intLocationId;
+				
+			if (intLocationId is null) then
+				insert into t_location(f_citylocid,f_streetno,f_zip) 
+				values (intCityLocationId,p_streetno,p_zip) 
+				returning f_uid into intLocationId;
+			end if;    
+		end if;
+	else
+		intLocationId = intCityLocationId;
+	end if;
+	
+	return intLocationId;
+END;
+$$ LANGUAGE plpgsql;
+
+/* intAmPm must be 0 or 12 */
+CREATE OR REPLACE FUNCTION SP_RETURNTIME(
+	intHour integer,
+	intMin	integer,
+	intAmPm	integer
+)
+RETURNS TEXT AS $$
+BEGIN
+	return ((intHour + intAmPm) * 100) + intMin;
+END;
+$$ LANGUAGE plpgsql;
+
+/**************************************** GENERIC FUNCTIONS END **************************************/
+
+/**************************************** MAINT FUNCTIONS START **************************************/
+/* SP_STOREBYEMP Output where 1 and 4 are t_employee.f_storenoid
+	'{"stores":[1,4],"inv":0}' */
+CREATE OR REPLACE FUNCTION SP_STOREBYEMP(
+	iUserId integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	sReturn text;
+BEGIN
+	sReturn = '';
+
+	select '[' || f_storenoid || ',' || f_admincode || ']' from t_employee where f_userid = iUserId into sReturn;
+	if (sReturn is null) then
+		sReturn = '';
+	end if;
+	return '{"stores":' || sReturn  || '}';
+END;
+$$language plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_MODIFYPRODUCT(
+	iProdLocId		integer,
+	sProdId		text,
+	sName		text,
+	iLocID 		integer
+)
+RETURNS TEXT AS $$
+DECLARE
+	iReturn integer;
+BEGIN
+	iReturn = -1;
+	if iProdLocId < 0 then
+		delete from t_producelocation where f_uid = abs(iProdLocId);
+	elseif iLocID > 0 then
+		update t_producelocation set f_storelocationid = iLocId where f_uid = iProdLocId;
+	elseif length(sName) > 0 then
+		update t_produce set f_commodity = sName where f_uid = sProdId;
+	end if;
+	return iReturn;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_MODIFYLOCATION(
+	iId		integer,	
+	sName		text
+)
+RETURNS TEXT AS $$
+DECLARE
+	iReturn integer;
+BEGIN
+	iReturn = -1;
+	if iId < 0 then
+		delete from t_storeloc where f_uid = abs(iId);
+	elseif length(sName) > 0 then
+		update t_storeloc set f_name = sName where f_uid = iId;
+	end if;
+	return iReturn;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION SP_ADDLOCATION(
+	pDeptId		integer,	
+	pName		text
+)
+RETURNS TEXT AS $$
+DECLARE
+	iReturn integer;
+BEGIN
+	select f_uid from t_storeloc where f_name = pName and f_deptid = pDeptid into iReturn;
+	if iReturn is null then
+		insert into t_storeloc(f_deptid,f_name) values(pDeptId, pName);
+	end if;
+
+	return '';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION SP_ADDLOGINCODE(
+	p_code	integer,
+	p_desc	text
+)
+RETURNS TEXT AS $$
+DECLARE
+	iReturn integer;
+BEGIN
+	select f_uid from t_logincode where f_code = p_code into iReturn;
+	if iReturn is null then
+		insert into t_logincode(f_code,f_desc) values (p_code,p_desc) returning f_code into iReturn;
+	else
+		update t_logincode set f_desc = p_desc where f_code = p_code returning p_code into iReturn;
+	end if;
+
+	return iReturn;
+END;
+$$LANGUAGE plpgsql;
+/**************************************** MAINT FUNCTIONS END **************************************/
+-- END POSTGRESS
